@@ -42,7 +42,6 @@ module AWS #:nodoc:
   # See more connection details at AWS::S3::Connection::Management::ClassMethods.
   module S3
     constant :DEFAULT_HOST, 's3.amazonaws.com'
-
     # AWS::S3::Base is the abstract super class of all classes who make requests against S3, such as the built in
     # Service, Bucket and S3Object classes. It provides methods for making requests, inferring or setting response classes,
     # processing request options, and accessing attributes from S3's response data.
@@ -55,7 +54,8 @@ module AWS #:nodoc:
     # details can be found in the docs for Connection::Management::ClassMethods.
     #
     # Extensive examples can be found in the README[link:files/README.html].
-    class Base
+    class Base 
+      
       class << self
         # Wraps the current connection's request method and picks the appropriate response class to wrap the response in.
         # If the response is an error, it will raise that error as an exception. All such exceptions can be caught by rescuing
@@ -91,6 +91,7 @@ module AWS #:nodoc:
           end
           EVAL
         end
+        
 
         # Called when a method which requires a bucket name is called without that bucket name specified. It will try to
         # infer the current bucket by looking for it as the subdomain of the current connection's address. If no subdomain

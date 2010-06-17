@@ -12,7 +12,7 @@ module AWS
         end
       end
 
-      attr_reader :access_key_id, :secret_access_key, :http, :options
+      attr_reader :access_key_id, :secret_access_key, :http, :options, :default_host
 
       # Creates a new connection. Connections make the actual requests to S3, though these requests are usually
       # called from subclasses of Base.
@@ -71,7 +71,7 @@ module AWS
       end
 
       def subdomain
-        http.address[/^([^.]+).#{options[:server]}$/, 1]
+        http.address[/^([^.]+).#{default_host}$/, 1]
       end
 
       def persistent?
@@ -95,6 +95,7 @@ module AWS
         extract_key = Proc.new {|key| options[key] || (missing_keys.push(key); nil)}
         @access_key_id     = extract_key[:access_key_id]
         @secret_access_key = extract_key[:secret_access_key]
+        @default_host = (options[:default_host] ? options[:default_host] : DEFAULT_HOST)
         raise MissingAccessKey.new(missing_keys) unless missing_keys.empty?
       end
 
@@ -197,6 +198,14 @@ module AWS
           # * <tt>:persistent</tt> - Whether to use a persistent connection to the server. Having this on provides around a two fold
           # performance increase but for long running processes some firewalls may find the long lived connection suspicious and close the connection.
           # If you run into connection errors, try setting <tt>:persistent</tt> to false. Defaults to false.
+          # * <tt>:default_host</tt> - If you wish to use another cloud provider such as google storage, you need to specify the URI for google storage.
+          #           Currently this is commondatastorage.googleapis.com  eg. 
+          #           
+          #           AWS::S3::Base.establish_connection!(
+          #               :access_key_id     => ENV['GOOGLE_ACCESS_KEY_ID'],
+          #               :secret_access_key => ENV['GOOGLE_SECRET_ACCESS_KEY'],
+          #               :default_host => ENV['GOOGLE_SERVER']
+          #             )
           # * <tt>:proxy</tt> - If you need to connect through a proxy, you can specify your proxy settings by specifying a <tt>:host</tt>, <tt>:port</tt>, <tt>:user</tt>, and <tt>:password</tt>
           # with the <tt>:proxy</tt> option.
           # The <tt>:host</tt> setting is required if specifying a <tt>:proxy</tt>.
@@ -258,12 +267,12 @@ module AWS
       end
 
       class Options < Hash #:nodoc:
-        VALID_OPTIONS = [:access_key_id, :secret_access_key, :server, :port, :use_ssl, :persistent, :proxy].freeze
+        VALID_OPTIONS = [:access_key_id, :secret_access_key, :server, :port, :use_ssl, :persistent, :proxy, :default_host].freeze
 
         def initialize(options = {})
           super()
           validate(options)
-          replace(:server => DEFAULT_HOST, :port => (options[:use_ssl] ? 443 : 80))
+          replace(:server => (options[:default_host] || DEFAULT_HOST), :port => (options[:use_ssl] ? 443 : 80))
           merge!(options)
         end
 

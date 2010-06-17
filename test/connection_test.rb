@@ -147,7 +147,7 @@ class ConnectionOptionsTest < Test::Unit::TestCase
   end
   
   def test_server_defaults_to_default_host
-    assert_equal DEFAULT_HOST, @default_options[:server]
+    assert_equal 's3.amazonaws.com', @default_options[:server]
   end
   
   def test_port_defaults_to_80_if_use_ssl_is_false
