@@ -186,7 +186,7 @@ module AWS
           end
       
           def build
-            xml.tag!('AccessControlPolicy', 'xmlns' => 'http://s3.amazonaws.com/doc/2006-03-01/') do
+            xml.tag!('AccessControlPolicy') do
               xml.Owner do
                 xml.ID owner.id
                 xml.DisplayName owner.display_name
@@ -407,7 +407,7 @@ module AWS
           
           # Lookups are in order of preference so if, for example, you set the uri but display_name and id are also
           # set, we'd rather go with the canonical representation.
-          if display_name && id
+          if id
             'CanonicalUser'
           elsif email_address
             'AmazonCustomerByEmail'
